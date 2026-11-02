@@ -2,20 +2,21 @@
   "name": "比錢啦！",
   "short_name": "比錢啦！",
   "description": "聚會出街·多人夾公數·極速找數 Web App",
-  "start_url": "./",
+  "start_url": "/pay-lah/",
+  "scope": "/pay-lah/",
   "display": "standalone",
   "background_color": "#020617",
   "theme_color": "#6366f1",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "./icon-192.png",
+      "src": "/pay-lah/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "./icon-512.png",
+      "src": "/pay-lah/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
