@@ -8,7 +8,24 @@ export function encodeEventToUrlHash(event: EventRecord): string {
   try {
     const jsonStr = JSON.stringify(event);
     const compressed = LZString.compressToEncodedURIComponent(jsonStr);
-    const baseUrl = window.location.origin + window.location.pathname;
+    
+    // In PWA standalone mode or different environments, window.location.pathname might include query params or trailing files
+    // Ensure clean public URL: https://kevindiu.github.io/pay-lah/
+    let baseUrl = window.location.origin + window.location.pathname;
+    
+    // If running on github.io, ensure proper /pay-lah/ base path
+    if (window.location.hostname.includes('github.io')) {
+      const match = window.location.pathname.match(/^(\/[^/]+)/);
+      const repoName = match ? match[1] : '/pay-lah';
+      baseUrl = `${window.location.origin}${repoName}/`;
+    } else {
+      // For localhost or custom domain, clean trailing filename if any
+      baseUrl = baseUrl.replace(/\/[^/]*\.[^/]+$/, '/');
+      if (!baseUrl.endsWith('/')) {
+        baseUrl += '/';
+      }
+    }
+
     return `${baseUrl}#d=${compressed}`;
   } catch (e) {
     console.error('Failed to encode event to URL hash', e);
