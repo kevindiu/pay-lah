@@ -213,6 +213,18 @@ export function App() {
       if (currentEventId === id) {
         setCurrentEventId(remaining[0].id);
       }
+    } else {
+      // If deleted the very last event, create a fresh empty one
+      const emptyEv: EventRecord = {
+        id: 'ev_' + Math.random().toString(36).substring(2, 9),
+        title: '新聚會',
+        createdAt: Date.now(),
+        currency: 'HKD',
+        members: [],
+        expenses: [],
+      };
+      setEvents([emptyEv]);
+      setCurrentEventId(emptyEv.id);
     }
   };
 

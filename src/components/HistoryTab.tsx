@@ -125,21 +125,19 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                     {formatCurrency(total, ev.currency)}
                   </span>
 
-                  {events.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (confirm(t('deleteEventConfirm'))) {
-                          onDeleteEvent(ev.id);
-                        }
-                      }}
-                      className="p-1.5 text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
-                      title={t('delete')}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm(t('deleteEventConfirm'))) {
+                        onDeleteEvent(ev.id);
+                      }
+                    }}
+                    className="p-1.5 text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                    title={t('delete')}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             );
