@@ -32,7 +32,6 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
   const [singlePayerId, setSinglePayerId] = useState<string>(members[0]?.id || '');
   const [multiPayers, setMultiPayers] = useState<Record<string, string>>({});
   const [participantIds, setParticipantIds] = useState<string[]>(members.map((m) => m.id));
-  const [serviceCharge, setServiceCharge] = useState<number>(0);
 
   const totalSpent = expenses.reduce((sum, e) => sum + e.amount, 0);
   const avgPerPerson = members.length > 0 ? totalSpent / members.length : 0;
@@ -45,7 +44,6 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
     setSinglePayerId(members[0]?.id || '');
     setMultiPayers({});
     setParticipantIds(members.map((m) => m.id));
-    setServiceCharge(0);
     setIsModalOpen(true);
   };
 
@@ -66,7 +64,6 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
       setMultiPayers(splits);
     }
     setParticipantIds(exp.participantIds.length > 0 ? exp.participantIds : members.map((m) => m.id));
-    setServiceCharge(exp.serviceChargePercent || 0);
     setIsModalOpen(true);
   };
 
@@ -77,9 +74,6 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
     let payers: PayerSplit[] = [];
     if (payerMode === 'single') {
       if (!singlePayerId) return;
-      if (serviceCharge > 0) {
-        totalAmt = Math.round(totalAmt * (1 + serviceCharge / 100) * 100) / 100;
-      }
       if (totalAmt <= 0) return;
       payers = [{ memberId: singlePayerId, amount: totalAmt }];
     } else {
@@ -105,7 +99,6 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
       amount: totalAmt,
       payers,
       participantIds,
-      serviceChargePercent: serviceCharge > 0 ? serviceCharge : undefined,
     };
 
     if (editingExpenseId) {
@@ -197,11 +190,6 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
                   <span className="font-bold text-slate-800 text-base truncate">
                     {exp.title}
                   </span>
-                  {exp.serviceChargePercent ? (
-                    <span className="text-[10px] bg-amber-50 text-amber-600 font-semibold px-2 py-0.5 rounded-full border border-amber-200/60">
-                      +{exp.serviceChargePercent}%
-                    </span>
-                  ) : null}
                 </div>
                 <div className="text-xs text-slate-500 flex flex-wrap gap-x-3 gap-y-0.5">
                   <span className="text-indigo-600 font-medium">
@@ -337,26 +325,6 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
                           }`}
                         >
                           <span>{m.name}</span>
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center gap-2 pt-1">
-                      <span className="text-xs text-slate-400 font-medium">
-                        {t('serviceCharge')}:
-                      </span>
-                      {[0, 10, 15].map((pct) => (
-                        <button
-                          key={pct}
-                          type="button"
-                          onClick={() => setServiceCharge(pct)}
-                          className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${
-                            serviceCharge === pct
-                              ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                          }`}
-                        >
-                          {pct === 0 ? '無' : `+${pct}%`}
                         </button>
                       ))}
                     </div>

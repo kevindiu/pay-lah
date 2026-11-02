@@ -26,10 +26,7 @@ export function calculateBalances(
       }
     }
 
-    const participants =
-      exp.participantIds && exp.participantIds.length > 0
-        ? exp.participantIds
-        : members.map((m) => m.id);
+    const participants = exp.participantIds || [];
 
     if (participants.length > 0) {
       const share = exp.amount / participants.length;
