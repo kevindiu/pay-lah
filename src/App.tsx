@@ -16,7 +16,6 @@ import {
   getSavedLanguage,
   saveLanguage,
 } from './utils/storage';
-import { decodeEventFromUrlHash } from './utils/urlSharing';
 import { MembersTab } from './components/MembersTab';
 import { ExpensesTab } from './components/ExpensesTab';
 import { SettlementTab } from './components/SettlementTab';
@@ -28,9 +27,35 @@ import {
   History as HistoryIcon,
   Globe,
   Coins,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 export function App() {
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    try {
+      const savedTheme = localStorage.getItem('paylah_theme');
+      if (savedTheme) return savedTheme === 'dark';
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('paylah_theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('paylah_theme', 'light');
+      }
+    } catch (e) {}
+  }, [isDark]);
+
+  const toggleTheme = () => setIsDark(!isDark);
+
   const [lang, setLang] = useState<Language>(() => {
     const saved = getSavedLanguage();
     if (saved && saved in TRANSLATIONS) return saved as Language;
@@ -38,18 +63,7 @@ export function App() {
   });
 
   const [events, setEvents] = useState<EventRecord[]>(() => {
-    // 1. Check if URL contains shared event data
-    const shared = decodeEventFromUrlHash();
     const saved = loadAllEvents();
-
-    if (shared) {
-      const exists = saved.find((e) => e.id === shared.id);
-      if (!exists) {
-        return [shared, ...saved];
-      }
-      return saved.map((e) => (e.id === shared.id ? shared : e));
-    }
-
     if (saved.length > 0) return saved;
 
     const defaultEv: EventRecord = {
@@ -68,8 +82,6 @@ export function App() {
   });
 
   const [currentEventId, setCurrentEventId] = useState<string>(() => {
-    const shared = decodeEventFromUrlHash();
-    if (shared) return shared.id;
     const savedId = getCurrentEventId();
     return savedId || 'default-1';
   });
@@ -205,20 +217,20 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between max-w-md mx-auto relative shadow-2xl overflow-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col justify-between max-w-md mx-auto relative shadow-2xl overflow-hidden transition-colors">
       {/* Top App Header */}
-      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 py-3">
+      <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 px-4 py-3">
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="text-xl font-black bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
+              <span className="text-xl font-black bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">
                 {t('appName')}
               </span>
-              <span className="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md">
+              <span className="text-[10px] bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 font-bold px-1.5 py-0.5 rounded-md">
                 PRO
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 font-medium">
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
               {currentEvent?.title || t('appTagline')}
             </p>
           </div>
@@ -232,7 +244,7 @@ export function App() {
                 onChange={(e) =>
                   handleCurrencyChange(e.target.value as Currency)
                 }
-                className="appearance-none bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold pl-2.5 pr-6 py-1.5 rounded-xl cursor-pointer focus:outline-none transition-all"
+                className="appearance-none bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold pl-2.5 pr-6 py-1.5 rounded-xl cursor-pointer focus:outline-none transition-all"
               >
                 {Object.values(CURRENCIES).map((c) => (
                   <option key={c.code} value={c.code}>
@@ -248,7 +260,7 @@ export function App() {
               <select
                 value={lang}
                 onChange={(e) => changeLanguage(e.target.value as Language)}
-                className="appearance-none bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold pl-2.5 pr-6 py-1.5 rounded-xl cursor-pointer focus:outline-none transition-all"
+                className="appearance-none bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold pl-2.5 pr-6 py-1.5 rounded-xl cursor-pointer focus:outline-none transition-all"
               >
                 <option value="zh-HK">繁中 (HK)</option>
                 <option value="zh-TW">繁中 (TW)</option>
@@ -258,6 +270,15 @@ export function App() {
               </select>
               <Globe className="w-3 h-3 text-slate-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
+            {/* Dark Mode Toggle */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+              title="切換深色模式"
+            >
+              {isDark ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-indigo-500" />}
+            </button>
           </div>
         </div>
       </header>
@@ -288,7 +309,10 @@ export function App() {
 
         {activeTab === 'settlement' && (
           <SettlementTab
-            currentEvent={currentEvent}
+            eventName={currentEvent?.title || '聚會'}
+            members={currentEvent?.members || []}
+            expenses={currentEvent?.expenses || []}
+            currency={currentEvent?.currency || 'HKD'}
             t={t}
           />
         )}
@@ -309,15 +333,15 @@ export function App() {
       </main>
 
       {/* Modern iOS Bottom Navigation Bar */}
-      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/95 backdrop-blur-md border-t border-slate-100 px-3 py-2 z-40 shadow-lg">
+      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-100 dark:border-slate-800 px-3 py-2 z-40 shadow-lg">
         <div className="grid grid-cols-4 gap-1 text-center">
           <button
             type="button"
             onClick={() => setActiveTab('members')}
             className={`flex flex-col items-center justify-center py-1.5 rounded-2xl transition-all ${
               activeTab === 'members'
-                ? 'text-indigo-600 font-bold bg-indigo-50/70'
-                : 'text-slate-400 font-medium hover:text-slate-600'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/70 dark:bg-indigo-950/50'
+                : 'text-slate-400 dark:text-slate-500 font-medium hover:text-slate-600 dark:hover:text-slate-300'
             }`}
           >
             <Users className="w-5 h-5 mb-0.5" />
@@ -329,8 +353,8 @@ export function App() {
             onClick={() => setActiveTab('expenses')}
             className={`flex flex-col items-center justify-center py-1.5 rounded-2xl transition-all ${
               activeTab === 'expenses'
-                ? 'text-indigo-600 font-bold bg-indigo-50/70'
-                : 'text-slate-400 font-medium hover:text-slate-600'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/70 dark:bg-indigo-950/50'
+                : 'text-slate-400 dark:text-slate-500 font-medium hover:text-slate-600 dark:hover:text-slate-300'
             }`}
           >
             <Receipt className="w-5 h-5 mb-0.5" />
@@ -342,8 +366,8 @@ export function App() {
             onClick={() => setActiveTab('settlement')}
             className={`flex flex-col items-center justify-center py-1.5 rounded-2xl transition-all relative ${
               activeTab === 'settlement'
-                ? 'text-indigo-600 font-bold bg-indigo-50/70'
-                : 'text-slate-400 font-medium hover:text-slate-600'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/70 dark:bg-indigo-950/50'
+                : 'text-slate-400 dark:text-slate-500 font-medium hover:text-slate-600 dark:hover:text-slate-300'
             }`}
           >
             <Scale className="w-5 h-5 mb-0.5" />
@@ -355,8 +379,8 @@ export function App() {
             onClick={() => setActiveTab('history')}
             className={`flex flex-col items-center justify-center py-1.5 rounded-2xl transition-all ${
               activeTab === 'history'
-                ? 'text-indigo-600 font-bold bg-indigo-50/70'
-                : 'text-slate-400 font-medium hover:text-slate-600'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/70 dark:bg-indigo-950/50'
+                : 'text-slate-400 dark:text-slate-500 font-medium hover:text-slate-600 dark:hover:text-slate-300'
             }`}
           >
             <HistoryIcon className="w-5 h-5 mb-0.5" />

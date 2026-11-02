@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import type { EventRecord } from '../types';
+import type { Member, Expense, Currency } from '../types';
 import {
   calculateSettlements,
   calculateBalances,
   formatCurrency,
 } from '../utils/settlement';
-import { encodeEventToUrlHash } from '../utils/urlSharing';
 import {
   ArrowRight,
   Share2,
@@ -14,22 +13,25 @@ import {
   ChevronDown,
   ChevronUp,
   Sparkles,
-  ExternalLink,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface SettlementTabProps {
-  currentEvent: EventRecord;
+  eventName: string;
+  members: Member[];
+  expenses: Expense[];
+  currency: Currency;
   t: (key: string, params?: Record<string, any>) => string;
 }
 
 export const SettlementTab: React.FC<SettlementTabProps> = ({
-  currentEvent,
+  eventName,
+  members,
+  expenses,
+  currency,
   t,
 }) => {
-  const { title: eventName, members, expenses, currency } = currentEvent;
   const [copied, setCopied] = useState(false);
-  const [copiedLink, setCopiedLink] = useState(false);
   const [showBalances, setShowBalances] = useState(false);
   const [settledMap, setSettledMap] = useState<Record<string, boolean>>({});
 
@@ -50,7 +52,6 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
   };
 
   const generateShareText = () => {
-    const shareUrl = encodeEventToUrlHash(currentEvent);
     const lines: string[] = [];
     lines.push(t('shareHeader', { eventName }));
     lines.push(t('shareTotalSpent', { amount: formatCurrency(totalSpent, currency) }));
@@ -71,9 +72,6 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
       });
     }
 
-    lines.push('');
-    lines.push(`🔗 開入 App 查閱完整帳目明細：`);
-    lines.push(shareUrl);
     lines.push('');
     lines.push(t('shareFooter'));
     return lines.join('\n');
@@ -135,48 +133,21 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-3 gap-2 pt-1">
+        <div className="grid grid-cols-2 gap-2 pt-1">
           <button
             type="button"
             onClick={handleCopyText}
-            className="py-2.5 px-2 bg-white text-teal-800 hover:bg-teal-50 font-bold text-xs rounded-xl shadow-xs active:scale-95 transition-all flex items-center justify-center gap-1"
+            className="py-2.5 px-3 bg-white text-teal-800 hover:bg-teal-50 font-bold text-xs rounded-xl shadow-xs active:scale-95 transition-all flex items-center justify-center gap-1.5"
           >
             {copied ? (
               <>
-                <Check className="w-3.5 h-3.5 text-emerald-600" />
-                <span>已複製</span>
+                <Check className="w-4 h-4 text-emerald-600" />
+                <span>{t('copiedAlert')}</span>
               </>
             ) : (
               <>
-                <Copy className="w-3.5 h-3.5" />
-                <span>複製清單</span>
-              </>
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={async () => {
-              const url = encodeEventToUrlHash(currentEvent);
-              try {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                  await navigator.clipboard.writeText(url);
-                }
-                setCopiedLink(true);
-                setTimeout(() => setCopiedLink(false), 2500);
-              } catch (e) {}
-            }}
-            className="py-2.5 px-2 bg-white text-teal-800 hover:bg-teal-50 font-bold text-xs rounded-xl shadow-xs active:scale-95 transition-all flex items-center justify-center gap-1"
-          >
-            {copiedLink ? (
-              <>
-                <Check className="w-3.5 h-3.5 text-emerald-600" />
-                <span>已複製</span>
-              </>
-            ) : (
-              <>
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>複製連結</span>
+                <Copy className="w-4 h-4" />
+                <span>{t('copyTransferText')}</span>
               </>
             )}
           </button>
@@ -184,10 +155,10 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
           <button
             type="button"
             onClick={handleNativeShare}
-            className="py-2.5 px-2 bg-teal-700/80 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs active:scale-95 transition-all flex items-center justify-center gap-1"
+            className="py-2.5 px-3 bg-teal-700/80 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs active:scale-95 transition-all flex items-center justify-center gap-1.5"
           >
-            <Share2 className="w-3.5 h-3.5" />
-            <span>分享</span>
+            <Share2 className="w-4 h-4" />
+            <span>{t('shareBill')}</span>
           </button>
         </div>
       </div>
@@ -204,8 +175,8 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
               onClick={() => toggleSettled(itemKey)}
               className={`p-4 rounded-2xl border transition-all cursor-pointer select-none flex items-center justify-between shadow-2xs ${
                 isSettled
-                  ? 'bg-slate-50/70 border-slate-200 opacity-60'
-                  : 'bg-white border-slate-100 hover:border-slate-200 hover:shadow-xs'
+                  ? 'bg-slate-50/70 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 opacity-60'
+                  : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 hover:shadow-xs'
               }`}
             >
               <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -213,20 +184,20 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
                   <div
                     className={`px-3 py-1.5 rounded-xl font-bold text-sm truncate max-w-[100px] ${
                       isSettled
-                        ? 'bg-slate-200 text-slate-500 line-through'
-                        : 'bg-rose-50 text-rose-600 border border-rose-200/50'
+                        ? 'bg-slate-200 dark:bg-slate-800 text-slate-500 line-through'
+                        : 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200/50 dark:border-rose-900/50'
                     }`}
                   >
                     {tr.fromName}
                   </div>
 
-                  <ArrowRight className="w-4 h-4 text-slate-300 shrink-0" />
+                  <ArrowRight className="w-4 h-4 text-slate-300 dark:text-slate-600 shrink-0" />
 
                   <div
                     className={`px-3 py-1.5 rounded-xl font-bold text-sm truncate max-w-[100px] ${
                       isSettled
-                        ? 'bg-slate-200 text-slate-500 line-through'
-                        : 'bg-emerald-50 text-emerald-600 border border-emerald-200/50'
+                        ? 'bg-slate-200 dark:bg-slate-800 text-slate-500 line-through'
+                        : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-900/50'
                     }`}
                   >
                     {tr.toName}
@@ -237,7 +208,7 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
               <div className="flex items-center gap-3 shrink-0">
                 <span
                   className={`text-lg font-black tracking-tight ${
-                    isSettled ? 'text-slate-400 line-through' : 'text-slate-900'
+                    isSettled ? 'text-slate-400 dark:text-slate-600 line-through' : 'text-slate-900 dark:text-slate-100'
                   }`}
                 >
                   {formatCurrency(tr.amount, currency)}
@@ -247,7 +218,7 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
                   className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
                     isSettled
                       ? 'bg-emerald-500 text-white'
-                      : 'border-2 border-slate-200 text-transparent hover:border-slate-300'
+                      : 'border-2 border-slate-200 dark:border-slate-700 text-transparent hover:border-slate-300'
                   }`}
                 >
                   <Check className="w-3.5 h-3.5 stroke-[3]" />
@@ -259,11 +230,11 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
       </div>
 
       {/* Accordion: Individual Balances Breakdown */}
-      <div className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-2xs">
+      <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-2xs">
         <button
           type="button"
           onClick={() => setShowBalances(!showBalances)}
-          className="w-full px-4 py-3.5 flex items-center justify-between text-left text-xs font-semibold uppercase tracking-wider text-slate-500 hover:bg-slate-50/50 transition-colors"
+          className="w-full px-4 py-3.5 flex items-center justify-between text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors"
         >
           <span>{t('netBalanceTitle')}</span>
           {showBalances ? (
@@ -274,12 +245,12 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
         </button>
 
         {showBalances && (
-          <div className="p-4 pt-1 space-y-2 border-t border-slate-100 divide-y divide-slate-50">
+          <div className="p-4 pt-1 space-y-2 border-t border-slate-100 dark:border-slate-800 divide-y divide-slate-50 dark:divide-slate-800">
             {balances.map((b) => (
               <div key={b.memberId} className="pt-2 flex items-center justify-between text-sm">
                 <div className="space-y-0.5">
-                  <span className="font-semibold text-slate-800">{b.memberName}</span>
-                  <div className="text-[11px] text-slate-400">
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{b.memberName}</span>
+                  <div className="text-[11px] text-slate-400 dark:text-slate-500">
                     {t('paidTotal')}: {formatCurrency(b.totalPaid, currency)} | {t('owedTotal')}:{' '}
                     {formatCurrency(b.totalOwed, currency)}
                   </div>
@@ -287,10 +258,10 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
                 <div
                   className={`font-bold text-sm ${
                     b.netBalance > 0
-                      ? 'text-emerald-600'
+                      ? 'text-emerald-600 dark:text-emerald-400'
                       : b.netBalance < 0
-                      ? 'text-rose-500'
-                      : 'text-slate-400'
+                      ? 'text-rose-500 dark:text-rose-400'
+                      : 'text-slate-400 dark:text-slate-500'
                   }`}
                 >
                   {b.netBalance > 0

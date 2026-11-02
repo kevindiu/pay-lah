@@ -143,11 +143,11 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
             {formatCurrency(totalSpent, currency)}
           </span>
         </div>
-        <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-xs flex flex-col justify-between">
-          <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-col justify-between">
+          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">
             {t('avgPerPerson')}
           </span>
-          <span className="text-xl font-bold text-slate-800 tracking-tight mt-1">
+          <span className="text-xl font-bold text-slate-800 dark:text-slate-100 tracking-tight mt-1">
             {formatCurrency(avgPerPerson, currency)}
           </span>
         </div>
@@ -170,11 +170,11 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
       </div>
 
       {expenses.length === 0 ? (
-        <div className="bg-white border border-dashed border-slate-200 rounded-3xl p-8 text-center space-y-3">
-          <div className="w-12 h-12 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
+        <div className="bg-white dark:bg-slate-900 border border-dashed border-slate-200 dark:border-slate-800 rounded-3xl p-8 text-center space-y-3">
+          <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
             <Receipt className="w-6 h-6" />
           </div>
-          <p className="text-slate-500 text-sm max-w-xs mx-auto">
+          <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xs mx-auto">
             {t('noExpensesYet')}
           </p>
         </div>
@@ -183,16 +183,16 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
           {expenses.map((exp) => (
             <div
               key={exp.id}
-              className="bg-white border border-slate-100 rounded-2xl p-4 shadow-xs flex items-center justify-between hover:border-slate-200 transition-all"
+              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 rounded-2xl p-4 shadow-xs flex items-center justify-between transition-all"
             >
               <div className="space-y-1 min-w-0 flex-1 pr-2">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-slate-800 text-base truncate">
+                  <span className="font-bold text-slate-800 dark:text-slate-100 text-base truncate">
                     {exp.title}
                   </span>
                 </div>
-                <div className="text-xs text-slate-500 flex flex-wrap gap-x-3 gap-y-0.5">
-                  <span className="text-indigo-600 font-medium">
+                <div className="text-xs text-slate-500 dark:text-slate-400 flex flex-wrap gap-x-3 gap-y-0.5">
+                  <span className="text-indigo-600 dark:text-indigo-400 font-medium">
                     {t('paidBy', { payers: getPayerDisplay(exp) })}
                   </span>
                   <span>•</span>
@@ -202,23 +202,23 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
 
               <div className="flex items-center gap-3 shrink-0">
                 <div className="text-right">
-                  <span className="text-lg font-bold text-slate-900 tracking-tight block">
+                  <span className="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight block">
                     {formatCurrency(exp.amount, currency)}
                   </span>
-                  <span className="text-[11px] text-slate-400 font-medium">
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
                     {formatCurrency(exp.amount / exp.participantIds.length, currency)} /人
                   </span>
                 </div>
-                <div className="flex items-center gap-1 border-l border-slate-100 pl-2">
+                <div className="flex items-center gap-1 border-l border-slate-100 dark:border-slate-800 pl-2">
                   <button
                     onClick={() => openEditModal(exp)}
-                    className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-slate-50 transition-colors"
+                    className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => onDeleteExpense(exp.id)}
-                    className="p-1.5 text-slate-300 hover:text-rose-500 rounded-lg hover:bg-rose-50 transition-colors"
+                    className="p-1.5 text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -231,19 +231,19 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
 
       {/* Add / Edit Expense Drawer Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-xs transition-opacity p-0 sm:p-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-xs transition-opacity p-0 sm:p-4">
           <div
-            className="w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl max-h-[92vh] overflow-y-auto animate-in slide-in-from-bottom duration-200 space-y-5"
+            className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl max-h-[92vh] overflow-y-auto animate-in slide-in-from-bottom duration-200 space-y-5"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <h3 className="text-lg font-bold text-slate-900">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
                 {editingExpenseId ? t('modalEditTitle') : t('modalAddTitle')}
               </h3>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 text-sm font-semibold p-1"
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 text-sm font-semibold p-1"
               >
                 {t('cancel')}
               </button>
@@ -251,7 +251,7 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
 
             <form onSubmit={handleSave} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
                   {t('expenseTitlePlaceholder')}
                 </label>
                 <input
@@ -259,23 +259,23 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="例：打邊爐 / 居酒屋 / Uber"
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-slate-800 font-medium"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-slate-800 dark:text-slate-100 font-medium"
                 />
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                     {t('payersLabel')}
                   </label>
-                  <div className="bg-slate-100 p-0.5 rounded-xl flex text-xs font-semibold">
+                  <div className="bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl flex text-xs font-semibold">
                     <button
                       type="button"
                       onClick={() => setPayerMode('single')}
                       className={`px-3 py-1 rounded-lg transition-all ${
                         payerMode === 'single'
-                          ? 'bg-white text-indigo-600 shadow-xs'
-                          : 'text-slate-500 hover:text-slate-800'
+                          ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                          : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                       }`}
                     >
                       {t('singlePayerMode')}
@@ -285,8 +285,8 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
                       onClick={() => setPayerMode('multi')}
                       className={`px-3 py-1 rounded-lg transition-all ${
                         payerMode === 'multi'
-                          ? 'bg-white text-indigo-600 shadow-xs'
-                          : 'text-slate-500 hover:text-slate-800'
+                          ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                          : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                       }`}
                     >
                       {t('multiPayerMode')}
@@ -304,7 +304,7 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
                         value={amountStr}
                         onChange={(e) => setAmountStr(e.target.value)}
                         placeholder="0.00"
-                        className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-2xl font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                        className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-2xl font-bold text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                         autoFocus
                       />
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-lg">
@@ -321,7 +321,7 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
                           className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5 ${
                             singlePayerId === m.id
                               ? 'bg-indigo-600 text-white shadow-xs'
-                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                           }`}
                         >
                           <span>{m.name}</span>
@@ -330,13 +330,13 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-2 max-h-48 overflow-y-auto p-1 bg-slate-50 rounded-2xl border border-slate-200">
+                  <div className="space-y-2 max-h-48 overflow-y-auto p-1 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700">
                     {members.map((m) => (
                       <div
                         key={m.id}
-                        className="flex items-center justify-between p-2 bg-white rounded-xl shadow-2xs"
+                        className="flex items-center justify-between p-2 bg-white dark:bg-slate-800 rounded-xl shadow-2xs"
                       >
-                        <span className="font-semibold text-sm text-slate-800 truncate">
+                        <span className="font-semibold text-sm text-slate-800 dark:text-slate-200 truncate">
                           {m.name}
                         </span>
                         <div className="flex items-center gap-1.5 w-32">
@@ -352,7 +352,7 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
                                 [m.id]: e.target.value,
                               })
                             }
-                            className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-right font-bold text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm"
+                            className="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-right font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm"
                           />
                         </div>
                       </div>
@@ -361,20 +361,20 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
                 )}
               </div>
 
-              <div className="space-y-2 pt-2 border-t border-slate-100">
+              <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                     {t('splitAmongLabel')} ({participantIds.length} 人)
                   </label>
                   <div className="flex gap-2 text-xs">
                     <button
                       type="button"
                       onClick={() => setParticipantIds(members.map((m) => m.id))}
-                      className="text-indigo-600 hover:underline font-semibold"
+                      className="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
                     >
                       {t('selectAll')}
                     </button>
-                    <span className="text-slate-300">|</span>
+                    <span className="text-slate-300 dark:text-slate-700">|</span>
                     <button
                       type="button"
                       onClick={() => setParticipantIds([])}
@@ -395,8 +395,8 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
                         onClick={() => toggleParticipant(m.id)}
                         className={`p-2.5 rounded-xl border text-left flex items-center justify-between transition-all ${
                           selected
-                            ? 'bg-indigo-50/60 border-indigo-200 text-indigo-900 font-semibold'
-                            : 'bg-white border-slate-200 text-slate-400 font-normal hover:bg-slate-50'
+                            ? 'bg-indigo-50/60 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200 font-semibold'
+                            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 font-normal hover:bg-slate-50 dark:hover:bg-slate-750'
                         }`}
                       >
                         <span className="truncate text-sm">{m.name}</span>
@@ -404,7 +404,7 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
                           className={`w-4 h-4 rounded-md flex items-center justify-center text-[10px] font-bold ${
                             selected
                               ? 'bg-indigo-600 text-white'
-                              : 'border border-slate-300'
+                              : 'border border-slate-300 dark:border-slate-600'
                           }`}
                         >
                           {selected ? '✓' : ''}
@@ -418,7 +418,7 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
               <div className="pt-3">
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-2xl shadow-lg shadow-indigo-200 active:scale-[0.99] transition-all"
+                  className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-2xl shadow-lg shadow-indigo-200 dark:shadow-none active:scale-[0.99] transition-all"
                 >
                   {t('saveExpense')}
                 </button>

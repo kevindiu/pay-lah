@@ -36,14 +36,14 @@ export const MembersTab: React.FC<MembersTabProps> = ({
             value={nameInput}
             onChange={(e) => setNameInput(e.target.value)}
             placeholder={t('addMemberPlaceholder')}
-            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-slate-800 placeholder-slate-400 font-medium text-base transition-all"
+            className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-slate-800 dark:text-slate-100 placeholder-slate-400 font-medium text-base transition-all"
             autoFocus
           />
         </div>
         <button
           type="submit"
           disabled={!nameInput.trim()}
-          className="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:hover:bg-indigo-600 text-white font-semibold rounded-2xl shadow-md shadow-indigo-200 active:scale-95 transition-all flex items-center gap-1.5 shrink-0"
+          className="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:hover:bg-indigo-600 text-white font-semibold rounded-2xl shadow-md shadow-indigo-200 dark:shadow-none active:scale-95 transition-all flex items-center gap-1.5 shrink-0"
         >
           <UserPlus className="w-5 h-5" />
           <span>{t('addMemberBtn')}</span>
@@ -51,17 +51,17 @@ export const MembersTab: React.FC<MembersTabProps> = ({
       </form>
 
       {/* Members Counter Header */}
-      <div className="flex items-center justify-between px-1 text-xs font-semibold uppercase tracking-wider text-slate-400">
+      <div className="flex items-center justify-between px-1 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
         <span>{t('membersCount', { n: members.length })}</span>
       </div>
 
       {/* Members Grid / List */}
       {members.length === 0 ? (
-        <div className="bg-white border border-dashed border-slate-200 rounded-3xl p-8 text-center space-y-3">
-          <div className="w-12 h-12 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center mx-auto">
+        <div className="bg-white dark:bg-slate-900 border border-dashed border-slate-200 dark:border-slate-800 rounded-3xl p-8 text-center space-y-3">
+          <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-500 rounded-2xl flex items-center justify-center mx-auto">
             <Users className="w-6 h-6" />
           </div>
-          <p className="text-slate-500 text-sm max-w-xs mx-auto">
+          <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xs mx-auto">
             {t('noMembersYet')}
           </p>
         </div>
@@ -70,20 +70,20 @@ export const MembersTab: React.FC<MembersTabProps> = ({
           {members.map((m) => (
             <div
               key={m.id}
-              className="group bg-white border border-slate-100 hover:border-slate-200 rounded-2xl p-3.5 flex items-center justify-between shadow-xs transition-all"
+              className="group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 hover:border-slate-200 dark:hover:border-slate-700 rounded-2xl p-3.5 flex items-center justify-between shadow-xs transition-all"
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-violet-400 text-white flex items-center justify-center font-bold text-sm shrink-0">
                   {m.name.charAt(0).toUpperCase()}
                 </div>
-                <span className="font-semibold text-slate-800 truncate text-sm">
+                <span className="font-semibold text-slate-800 dark:text-slate-100 truncate text-sm">
                   {m.name}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => onRemoveMember(m.id)}
-                className="text-slate-300 hover:text-rose-500 p-1 rounded-lg hover:bg-rose-50 transition-colors"
+                className="text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 p-1 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
                 title={t('delete')}
               >
                 <Trash2 className="w-4 h-4" />
@@ -99,7 +99,7 @@ export const MembersTab: React.FC<MembersTabProps> = ({
           <button
             type="button"
             onClick={onNext}
-            className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-2xl shadow-lg shadow-slate-200 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+            className="w-full py-3.5 bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-700 text-white font-medium rounded-2xl shadow-lg shadow-slate-200 dark:shadow-none active:scale-[0.99] transition-all flex items-center justify-center gap-2"
           >
             <span>{t('nextToExpenses')}</span>
             <ArrowRight className="w-4 h-4" />
