@@ -16,6 +16,7 @@ import {
   getSavedLanguage,
   saveLanguage,
 } from './utils/storage';
+import { APP_VERSION } from './version';
 import { MembersTab } from './components/MembersTab';
 import { ExpensesTab } from './components/ExpensesTab';
 import { SettlementTab } from './components/SettlementTab';
@@ -89,6 +90,38 @@ export function App() {
   const [activeTab, setActiveTab] = useState<
     'members' | 'expenses' | 'settlement' | 'history'
   >('members');
+
+  const [hasUpdate, setHasUpdate] = useState<boolean>(false);
+
+  // Check for app updates with throttle (at most once every 30 minutes)
+  useEffect(() => {
+    const CHECK_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
+    const lastCheckStr = localStorage.getItem('paylah_last_update_check');
+    const now = Date.now();
+
+    if (lastCheckStr && now - parseInt(lastCheckStr, 10) < CHECK_INTERVAL_MS) {
+      return;
+    }
+
+    localStorage.setItem('paylah_last_update_check', now.toString());
+
+    fetch(`./version.json?t=${now}`, { cache: 'no-store' })
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch version');
+        return res.json();
+      })
+      .then((data) => {
+        if (data && data.version && data.version !== APP_VERSION) {
+          setHasUpdate(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleUpdateApp = () => {
+    localStorage.removeItem('paylah_last_update_check');
+    window.location.reload();
+  };
 
   useEffect(() => {
     saveAllEvents(events);
@@ -231,6 +264,18 @@ export function App() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col justify-between max-w-md mx-auto relative shadow-2xl overflow-hidden transition-colors">
       {/* Top App Header */}
+      {hasUpdate && (
+        <div className="bg-indigo-600 text-white px-4 py-2 text-xs font-semibold flex items-center justify-between z-50 sticky top-0 shadow-md">
+          <span>🎉 發現新版本！立即更新以體驗最新功能</span>
+          <button
+            type="button"
+            onClick={handleUpdateApp}
+            className="bg-white text-indigo-700 px-2.5 py-1 rounded-lg text-xs font-bold active:scale-95 transition-all shadow-xs"
+          >
+            立即更新
+          </button>
+        </div>
+      )}
       <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 px-4 py-3">
         <div className="flex items-center justify-between">
           <div>
