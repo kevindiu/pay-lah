@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import type { Member, Expense, Currency } from '../types';
+import type { EventRecord } from '../types';
 import {
   calculateSettlements,
   calculateBalances,
   formatCurrency,
 } from '../utils/settlement';
+import { encodeEventToUrlHash } from '../utils/urlSharing';
 import {
   ArrowRight,
   Share2,
@@ -13,25 +14,22 @@ import {
   ChevronDown,
   ChevronUp,
   Sparkles,
+  ExternalLink,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface SettlementTabProps {
-  eventName: string;
-  members: Member[];
-  expenses: Expense[];
-  currency: Currency;
+  currentEvent: EventRecord;
   t: (key: string, params?: Record<string, any>) => string;
 }
 
 export const SettlementTab: React.FC<SettlementTabProps> = ({
-  eventName,
-  members,
-  expenses,
-  currency,
+  currentEvent,
   t,
 }) => {
+  const { title: eventName, members, expenses, currency } = currentEvent;
   const [copied, setCopied] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
   const [showBalances, setShowBalances] = useState(false);
   const [settledMap, setSettledMap] = useState<Record<string, boolean>>({});
 
@@ -52,6 +50,7 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
   };
 
   const generateShareText = () => {
+    const shareUrl = encodeEventToUrlHash(currentEvent);
     const lines: string[] = [];
     lines.push(t('shareHeader', { eventName }));
     lines.push(t('shareTotalSpent', { amount: formatCurrency(totalSpent, currency) }));
@@ -72,6 +71,9 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
       });
     }
 
+    lines.push('');
+    lines.push(`🔗 開入 App 查閱完整帳目明細：`);
+    lines.push(shareUrl);
     lines.push('');
     lines.push(t('shareFooter'));
     return lines.join('\n');
@@ -133,21 +135,48 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-2 pt-1">
+        <div className="grid grid-cols-3 gap-2 pt-1">
           <button
             type="button"
             onClick={handleCopyText}
-            className="py-2.5 px-3 bg-white text-teal-800 hover:bg-teal-50 font-bold text-xs rounded-xl shadow-xs active:scale-95 transition-all flex items-center justify-center gap-1.5"
+            className="py-2.5 px-2 bg-white text-teal-800 hover:bg-teal-50 font-bold text-xs rounded-xl shadow-xs active:scale-95 transition-all flex items-center justify-center gap-1"
           >
             {copied ? (
               <>
-                <Check className="w-4 h-4 text-emerald-600" />
-                <span>{t('copiedAlert')}</span>
+                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                <span>已複製</span>
               </>
             ) : (
               <>
-                <Copy className="w-4 h-4" />
-                <span>{t('copyTransferText')}</span>
+                <Copy className="w-3.5 h-3.5" />
+                <span>複製清單</span>
+              </>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={async () => {
+              const url = encodeEventToUrlHash(currentEvent);
+              try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                  await navigator.clipboard.writeText(url);
+                }
+                setCopiedLink(true);
+                setTimeout(() => setCopiedLink(false), 2500);
+              } catch (e) {}
+            }}
+            className="py-2.5 px-2 bg-white text-teal-800 hover:bg-teal-50 font-bold text-xs rounded-xl shadow-xs active:scale-95 transition-all flex items-center justify-center gap-1"
+          >
+            {copiedLink ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                <span>已複製</span>
+              </>
+            ) : (
+              <>
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>複製連結</span>
               </>
             )}
           </button>
@@ -155,10 +184,10 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
           <button
             type="button"
             onClick={handleNativeShare}
-            className="py-2.5 px-3 bg-teal-700/80 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs active:scale-95 transition-all flex items-center justify-center gap-1.5"
+            className="py-2.5 px-2 bg-teal-700/80 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs active:scale-95 transition-all flex items-center justify-center gap-1"
           >
-            <Share2 className="w-4 h-4" />
-            <span>{t('shareBill')}</span>
+            <Share2 className="w-3.5 h-3.5" />
+            <span>分享</span>
           </button>
         </div>
       </div>

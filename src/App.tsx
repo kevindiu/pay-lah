@@ -16,6 +16,7 @@ import {
   getSavedLanguage,
   saveLanguage,
 } from './utils/storage';
+import { decodeEventFromUrlHash } from './utils/urlSharing';
 import { MembersTab } from './components/MembersTab';
 import { ExpensesTab } from './components/ExpensesTab';
 import { SettlementTab } from './components/SettlementTab';
@@ -37,7 +38,18 @@ export function App() {
   });
 
   const [events, setEvents] = useState<EventRecord[]>(() => {
+    // 1. Check if URL contains shared event data
+    const shared = decodeEventFromUrlHash();
     const saved = loadAllEvents();
+
+    if (shared) {
+      const exists = saved.find((e) => e.id === shared.id);
+      if (!exists) {
+        return [shared, ...saved];
+      }
+      return saved.map((e) => (e.id === shared.id ? shared : e));
+    }
+
     if (saved.length > 0) return saved;
 
     const defaultEv: EventRecord = {
@@ -56,6 +68,8 @@ export function App() {
   });
 
   const [currentEventId, setCurrentEventId] = useState<string>(() => {
+    const shared = decodeEventFromUrlHash();
+    if (shared) return shared.id;
     const savedId = getCurrentEventId();
     return savedId || 'default-1';
   });
@@ -274,10 +288,7 @@ export function App() {
 
         {activeTab === 'settlement' && (
           <SettlementTab
-            eventName={currentEvent?.title || '聚會'}
-            members={currentEvent?.members || []}
-            expenses={currentEvent?.expenses || []}
-            currency={currentEvent?.currency || 'HKD'}
+            currentEvent={currentEvent}
             t={t}
           />
         )}
